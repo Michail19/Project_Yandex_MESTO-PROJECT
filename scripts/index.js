@@ -47,7 +47,7 @@ const popupImage = imagePopup.querySelector('.popup__image');
 const popupCaption = imagePopup.querySelector('.popup__caption');
 const closeImageButton = imagePopup.querySelector('.popup__close');
 
-// Функция для открытия попапа с изображением
+// Функция открытия попапа с изображением
 function openImagePopup(imageSrc, imageAlt) {
     popupImage.src = imageSrc;
     popupImage.alt = imageAlt;
@@ -56,60 +56,44 @@ function openImagePopup(imageSrc, imageAlt) {
     openModal(imagePopup);
 }
 
-// Добавляем обработчики на изображения карточек
-document.querySelectorAll('.card__image').forEach((image) => {
-    image.addEventListener('click', () => {
-        const imageSrc = image.src;
-        const imageAlt = image.alt;
-        openImagePopup(imageSrc, imageAlt);
-    });
-});
+// Закрытие попапа с изображением
+closeImageButton.addEventListener('click', () => closeModal(imagePopup));
 
-// Закрытие попапа
-closeImageButton.addEventListener('click', () => {
-    closeModal(imagePopup);
-});
-
+// Шаблон карточки и список
 const placesList = page.querySelector('.places__list');
 const cardTemplate = page.querySelector('#card-template').content;
 
-// Функция для добавления новой карточки
-function addCard(name, link) {
+// Функция для создания новой карточки
+function createCard(name, link) {
     const cardElement = cardTemplate.querySelector('.card').cloneNode(true);
 
     // Заполняем данные карточки
     const cardImage = cardElement.querySelector('.card__image');
     const cardTitle = cardElement.querySelector('.card__title');
-
     cardImage.src = link;
     cardImage.alt = name;
     cardTitle.textContent = name;
 
-    // Обработчики на кнопки карточки
-    const deleteButton = cardElement.querySelector('.card__delete-button');
-    deleteButton.addEventListener('click', () => {
-        cardElement.remove();
+    // Обработчики на элементы карточки
+    cardElement.querySelector('.card__delete-button').addEventListener('click', () => {
+        cardElement.remove(); // Удаление карточки
     });
 
-    const likeButton = cardElement.querySelector('.card__like-button');
-    likeButton.addEventListener('click', () => {
-        likeButton.classList.toggle('card__like-button_is-active');
+    cardElement.querySelector('.card__like-button').addEventListener('click', (event) => {
+        event.target.classList.toggle('card__like-button_is-active'); // Лайк
     });
 
-    // Добавляем обработчики на изображения карточек
-    document.querySelectorAll('.card__image').forEach((image) => {
-        image.addEventListener('click', () => {
-            const imageSrc = image.src;
-            const imageAlt = image.alt;
-            openImagePopup(imageSrc, imageAlt);
-        });
-    });
+    cardImage.addEventListener('click', () => openImagePopup(link, name)); // Открытие попапа с изображением
 
-    // Добавляем карточку в список
-    placesList.prepend(cardElement);
+    return cardElement;
 }
 
-// Обработчик отправки формы
+// Функция добавления карточки в список
+function addCard(name, link) {
+    const newCard = createCard(name, link);
+    placesList.prepend(newCard);
+}
+
 newCardForm.addEventListener('submit', (event) => {
     event.preventDefault(); // Отменяем стандартное поведение формы
 
@@ -117,12 +101,14 @@ newCardForm.addEventListener('submit', (event) => {
     const placeName = newCardForm.elements['place-name'].value;
     const placeLink = newCardForm.elements['link'].value;
 
+    // Добавляем новую карточку
     addCard(placeName, placeLink);
 
     // Закрываем попап и очищаем форму
     closeModal(newCardPopup);
     newCardForm.reset();
 });
+
 
 
 
