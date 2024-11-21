@@ -13,16 +13,54 @@ function closeModal(popup) {
 // Popap edit
 const editPopup = page.querySelector('.popup_type_edit');
 const editButton = page.querySelector('.profile__edit-button');
+const editForm = document.forms['edit-profile'];
+const profileName = page.querySelector('.profile__title');
+const profileDescription = page.querySelector('.profile__description');
 const closeEditButton = editPopup.querySelector('.popup__close');
 
 // Обработчики открытия и закрытия карточки edit
 editButton.addEventListener('click', () => {
+    editForm.elements['name'].value = profileName.textContent;
+    editForm.elements['description'].value = profileDescription.textContent;
     openModal(editPopup);
 });
 
 closeEditButton.addEventListener('click', () => {
     closeModal(editPopup);
 });
+
+// Обработчик сохранения формы
+editForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const nameInput = editForm.elements['name'].value;
+    const descriptionInput = editForm.elements['description'].value;
+
+    profileName.textContent = nameInput;
+    profileDescription.textContent = descriptionInput;
+
+    closeModal(editPopup);
+    saveProfileToLocalStorage(nameInput, descriptionInput); 
+});
+
+// Локальная загрузка данных
+document.addEventListener('DOMContentLoaded', () => {
+    loadProfileFromLocalStorage();
+});
+
+function saveProfileToLocalStorage(name, description) {
+    localStorage.setItem('profileName', name);
+    localStorage.setItem('profileDescription', description);
+}
+
+function loadProfileFromLocalStorage() {
+    const savedName = localStorage.getItem('profileName');
+    const savedDescription = localStorage.getItem('profileDescription');
+
+    if (savedName && savedDescription) {
+        profileName.textContent = savedName;
+        profileDescription.textContent = savedDescription;
+    }
+}
 
 
 // Popap new-card
@@ -109,6 +147,16 @@ newCardForm.addEventListener('submit', (event) => {
     newCardForm.reset();
 });
 
+
+// Функция для рендера начальных карточек
+function renderInitialCards(cards) {
+    cards.forEach((card) => {
+        addCard(card.name, card.link);
+    });
+}
+
+// Вызываем функцию при загрузке страницы
+renderInitialCards(initialCards);
 
 
 
