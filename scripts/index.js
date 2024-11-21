@@ -15,6 +15,7 @@ const editPopup = page.querySelector('.popup_type_edit');
 const editButton = page.querySelector('.profile__edit-button');
 const closeEditButton = editPopup.querySelector('.popup__close');
 
+// Обработчики открытия и закрытия карточки edit
 editButton.addEventListener('click', () => {
     openModal(editPopup);
 });
@@ -30,6 +31,7 @@ const newCardButton = page.querySelector('.profile__add-button');
 const closeNewCardButton = newCardPopup.querySelector('.popup__close');
 const newCardForm = newCardPopup.querySelector('.popup__form');
 
+// Обработчики открытия и закрытия карточки new-card
 newCardButton.addEventListener('click', () => {
     openModal(newCardPopup);
 });
@@ -38,8 +40,38 @@ closeNewCardButton.addEventListener('click', () => {
     closeModal(newCardPopup);
 });
 
-const placesList = document.querySelector('.places__list');
-const cardTemplate = document.querySelector('#card-template').content;
+
+// Popap card
+const imagePopup = page.querySelector('.popup_type_image');
+const popupImage = imagePopup.querySelector('.popup__image');
+const popupCaption = imagePopup.querySelector('.popup__caption');
+const closeImageButton = imagePopup.querySelector('.popup__close');
+
+// Функция для открытия попапа с изображением
+function openImagePopup(imageSrc, imageAlt) {
+    popupImage.src = imageSrc;
+    popupImage.alt = imageAlt;
+    popupCaption.textContent = imageAlt;
+
+    openModal(imagePopup);
+}
+
+// Добавляем обработчики на изображения карточек
+document.querySelectorAll('.card__image').forEach((image) => {
+    image.addEventListener('click', () => {
+        const imageSrc = image.src;
+        const imageAlt = image.alt;
+        openImagePopup(imageSrc, imageAlt);
+    });
+});
+
+// Закрытие попапа
+closeImageButton.addEventListener('click', () => {
+    closeModal(imagePopup);
+});
+
+const placesList = page.querySelector('.places__list');
+const cardTemplate = page.querySelector('#card-template').content;
 
 // Функция для добавления новой карточки
 function addCard(name, link) {
@@ -57,12 +89,20 @@ function addCard(name, link) {
     const deleteButton = cardElement.querySelector('.card__delete-button');
     deleteButton.addEventListener('click', () => {
         cardElement.remove();
-        closeModal(cardElement);
     });
 
     const likeButton = cardElement.querySelector('.card__like-button');
     likeButton.addEventListener('click', () => {
-        likeButton.classList.toggle('card__like-button_active');
+        likeButton.classList.toggle('card__like-button_is-active');
+    });
+
+    // Добавляем обработчики на изображения карточек
+    document.querySelectorAll('.card__image').forEach((image) => {
+        image.addEventListener('click', () => {
+            const imageSrc = image.src;
+            const imageAlt = image.alt;
+            openImagePopup(imageSrc, imageAlt);
+        });
     });
 
     // Добавляем карточку в список
@@ -77,7 +117,6 @@ newCardForm.addEventListener('submit', (event) => {
     const placeName = newCardForm.elements['place-name'].value;
     const placeLink = newCardForm.elements['link'].value;
 
-    // Добавляем карточку
     addCard(placeName, placeLink);
 
     // Закрываем попап и очищаем форму
