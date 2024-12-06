@@ -1,0 +1,5 @@
+.popup__input-error {
+    color: red;
+    font-size: 12px;
+    display: none; /* Ошибка скрыта по умолчанию */
+}

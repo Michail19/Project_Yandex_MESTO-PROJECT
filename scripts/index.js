@@ -9,26 +9,12 @@ function closeModal(popup) {
     popup.classList.remove('popup_is-opened');
 }
 
-// Проверка всех полей формы
-function validateForm(form) {
-    const inputs = Array.from(form.querySelectorAll('.form__input'));
-    let isValid = true;
-
-    inputs.forEach((input) => {
-        if (!input.validity.valid) {
-            isValid = false; // Если хоть одно поле не валидно, возвращаем false
-        }
-    });
-
-    return isValid;
-}
-
 
 // Popap edit
 const editPopup = page.querySelector('.popup_type_edit');
 const editButton = page.querySelector('.profile__edit-button');
 const editForm = document.forms['edit-profile'];
-const editFormError = formElement.querySelector(`.${formInput.id}-error`);
+const editFormError = editForm.querySelector(`.text-input-error`);
 const profileName = page.querySelector('.profile__title');
 const profileDescription = page.querySelector('.profile__description');
 const closeEditButton = editPopup.querySelector('.popup__close');
@@ -44,10 +30,81 @@ closeEditButton.addEventListener('click', () => {
     closeModal(editPopup);
 });
 
-// Обработчик сохранения формы
+// Функция для показа ошибки
+const showInputError = (form, input) => {
+    const errorElement = form.querySelector(`#${input.id}-error`);
+    input.classList.add('popup__input_type_error');
+    errorElement.textContent = input.validationMessage;
+    errorElement.classList.add('popup__input-error_active');
+};
+
+// Функция для скрытия ошибки
+const hideInputError = (form, input) => {
+    const errorElement = form.querySelector(`#${input.id}-error`);
+    input.classList.remove('popup__input_type_error');
+    errorElement.textContent = '';
+    errorElement.classList.remove('popup__input-error_active');
+};
+
+// Проверка конкретного поля
+const checkInputValidity = (form, input) => {
+    if (!input.validity.valid) {
+        showInputError(form, input);
+    } else {
+        hideInputError(form, input);
+    }
+};
+
+// Проверка всех полей формы
+const validateForm = (form) => {
+    const inputs = Array.from(form.querySelectorAll('.popup__input'));
+    let isValid = true;
+
+    inputs.forEach((input) => {
+        if (!input.validity.valid) {
+            isValid = false;
+            showInputError(form, input);
+        } else {
+            hideInputError(form, input);
+        }
+    });
+
+    return isValid;
+};
+
+// Включение слушателей на все поля формы
+const setEventListeners = (form) => {
+    const inputs = Array.from(form.querySelectorAll('.popup__input'));
+
+    inputs.forEach((input) => {
+        input.addEventListener('input', () => {
+            checkInputValidity(form, input);
+        });
+    });
+};
+
+// Инициализация валидации для форм
+const enableValidation = () => {
+    const forms = Array.from(document.querySelectorAll('.popup__form'));
+    forms.forEach((form) => {
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            if (validateForm(form)) {
+                // Дополнительные действия, если форма валидна
+                console.log('Форма успешно отправлена');
+            }
+        });
+        setEventListeners(form);
+    });
+};
+
+// Запуск валидации
+enableValidation();
+
+// Пример использования в обработчиках submit
 editForm.addEventListener('submit', (event) => {
     event.preventDefault();
-    
+
     if (validateForm(editForm)) {
         const nameInput = editForm.elements['name'].value;
         const descriptionInput = editForm.elements['description'].value;
@@ -56,8 +113,12 @@ editForm.addEventListener('submit', (event) => {
         profileDescription.textContent = descriptionInput;
 
         closeModal(editPopup);
-        saveProfileToLocalStorage(nameInput, descriptionInput); 
+        saveProfileToLocalStorage(nameInput, descriptionInput);
     }
+});
+
+editForm.addEventListener('input', function () {
+  checkEditValidity();
 });
 
 // Локальная загрузка данных
@@ -151,22 +212,37 @@ function addCard(name, link) {
 }
 
 newCardForm.addEventListener('submit', (event) => {
-    event.preventDefault(); // Отменяем стандартное поведение формы
+    event.preventDefault();
 
-    if (validateForm(newCardForm)) {
-        // Получаем значения из формы
-        const placeName = newCardForm.elements['place-name'].value;
-        const placeLink = newCardForm.elements['link'].value;
+    const placeName = newCardForm.elements['place-name'].value;
+    const placeLink = newCardForm.elements['link'].value;
 
-        // Добавляем новую карточку
-        addCard(placeName, placeLink);
-
-        // Закрываем попап и очищаем форму
-        closeModal(newCardPopup);
-        newCardForm.reset();
-    }
+    addCard(placeName, placeLink);
+    closeModal(newCardPopup);
+    newCardForm.reset();
 });
 
+newCardForm.addEventListener('input', function () {
+  checkEditValidity();
+});
+
+// Инициализация валидации для форм
+const enableValidationForm = () => {
+    const forms = Array.from(document.querySelectorAll('.popup__form'));
+    forms.forEach((form) => {
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            if (validateForm(form)) {
+                // Дополнительные действия, если форма валидна
+                console.log('Форма успешно отправлена');
+            }
+        });
+        setEventListeners(form);
+    });
+};
+
+// Запуск валидации
+enableValidationForm();
 
 // Функция для рендера начальных карточек
 function renderInitialCards(cards) {
