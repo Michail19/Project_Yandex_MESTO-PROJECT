@@ -10,6 +10,10 @@
   margin-bottom: 10px;
 }
 
+.popup__input:invalid {
+  border-bottom: 1px solid red; 
+} 
+
 .popup__input:last-of-type {
   margin-bottom: 0;
 }

@@ -9,6 +9,33 @@ function closeModal(popup) {
     popup.classList.remove('popup_is-opened');
 }
 
+// Проверка валидности поля
+function checkInputValidity(inputElement) {
+    if (!inputElement.validity.valid) {
+        // Если поле не валидно, показываем ошибку
+        showInputError(inputElement, inputElement.validationMessage);
+        return false;
+    } else {
+        // Если поле валидно, скрываем ошибку
+        hideInputError(inputElement);
+        return true;
+    }
+}
+
+// Проверка всех полей формы
+function validateForm(form) {
+    const inputs = Array.from(form.querySelectorAll('.form__input'));
+    let isValid = true;
+
+    inputs.forEach((input) => {
+        if (!checkInputValidity(input)) {
+            isValid = false; // Если хоть одно поле не валидно, возвращаем false
+        }
+    });
+
+    return isValid;
+}
+
 
 // Popap edit
 const editPopup = page.querySelector('.popup_type_edit');
@@ -97,16 +124,18 @@ function addCard(name, link) {
 newCardForm.addEventListener('submit', (event) => {
     event.preventDefault(); // Отменяем стандартное поведение формы
 
-    // Получаем значения из формы
-    const placeName = newCardForm.elements['place-name'].value;
-    const placeLink = newCardForm.elements['link'].value;
+    if (validateForm(newCardForm)) {
+        // Получаем значения из формы
+        const placeName = newCardForm.elements['place-name'].value;
+        const placeLink = newCardForm.elements['link'].value;
 
-    // Добавляем новую карточку
-    addCard(placeName, placeLink);
+        // Добавляем новую карточку
+        addCard(placeName, placeLink);
 
-    // Закрываем попап и очищаем форму
-    closeModal(newCardPopup);
-    newCardForm.reset();
+        // Закрываем попап и очищаем форму
+        closeModal(newCardPopup);
+        newCardForm.reset();
+    }
 });
 
 
