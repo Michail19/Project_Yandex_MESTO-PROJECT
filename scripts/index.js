@@ -9,26 +9,13 @@ function closeModal(popup) {
     popup.classList.remove('popup_is-opened');
 }
 
-// Проверка валидности поля
-function checkInputValidity(inputElement) {
-    if (!inputElement.validity.valid) {
-        // Если поле не валидно, показываем ошибку
-        showInputError(inputElement, inputElement.validationMessage);
-        return false;
-    } else {
-        // Если поле валидно, скрываем ошибку
-        hideInputError(inputElement);
-        return true;
-    }
-}
-
 // Проверка всех полей формы
 function validateForm(form) {
     const inputs = Array.from(form.querySelectorAll('.form__input'));
     let isValid = true;
 
     inputs.forEach((input) => {
-        if (!checkInputValidity(input)) {
+        if (!input.validity.valid) {
             isValid = false; // Если хоть одно поле не валидно, возвращаем false
         }
     });
@@ -41,6 +28,7 @@ function validateForm(form) {
 const editPopup = page.querySelector('.popup_type_edit');
 const editButton = page.querySelector('.profile__edit-button');
 const editForm = document.forms['edit-profile'];
+const editFormError = formElement.querySelector(`.${formInput.id}-error`);
 const profileName = page.querySelector('.profile__title');
 const profileDescription = page.querySelector('.profile__description');
 const closeEditButton = editPopup.querySelector('.popup__close');
@@ -59,14 +47,17 @@ closeEditButton.addEventListener('click', () => {
 // Обработчик сохранения формы
 editForm.addEventListener('submit', (event) => {
     event.preventDefault();
-    const nameInput = editForm.elements['name'].value;
-    const descriptionInput = editForm.elements['description'].value;
+    
+    if (validateForm(editForm)) {
+        const nameInput = editForm.elements['name'].value;
+        const descriptionInput = editForm.elements['description'].value;
 
-    profileName.textContent = nameInput;
-    profileDescription.textContent = descriptionInput;
+        profileName.textContent = nameInput;
+        profileDescription.textContent = descriptionInput;
 
-    closeModal(editPopup);
-    saveProfileToLocalStorage(nameInput, descriptionInput); 
+        closeModal(editPopup);
+        saveProfileToLocalStorage(nameInput, descriptionInput); 
+    }
 });
 
 // Локальная загрузка данных
