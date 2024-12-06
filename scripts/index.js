@@ -9,27 +9,6 @@ function closeModal(popup) {
     popup.classList.remove('popup_is-opened');
 }
 
-
-// Popap edit
-const editPopup = page.querySelector('.popup_type_edit');
-const editButton = page.querySelector('.profile__edit-button');
-const editForm = document.forms['edit-profile'];
-const editFormError = editForm.querySelector(`.text-input-error`);
-const profileName = page.querySelector('.profile__title');
-const profileDescription = page.querySelector('.profile__description');
-const closeEditButton = editPopup.querySelector('.popup__close');
-
-// Обработчики открытия и закрытия карточки edit
-editButton.addEventListener('click', () => {
-    editForm.elements['name'].value = profileName.textContent;
-    editForm.elements['description'].value = profileDescription.textContent;
-    openModal(editPopup);
-});
-
-closeEditButton.addEventListener('click', () => {
-    closeModal(editPopup);
-});
-
 // Функция для показа ошибки
 const showInputError = (form, input) => {
     const errorElement = form.querySelector(`#${input.id}-error`);
@@ -101,6 +80,28 @@ const enableValidation = () => {
 // Запуск валидации
 enableValidation();
 
+
+// Popap edit
+const editPopup = page.querySelector('.popup_type_edit');
+const editButton = page.querySelector('.profile__edit-button');
+const editForm = document.forms['edit-profile'];
+const editFormError = editForm.querySelector(`.text-input-error`);
+const profileName = page.querySelector('.profile__title');
+const profileDescription = page.querySelector('.profile__description');
+const closeEditButton = editPopup.querySelector('.popup__close');
+const editFormSubmitButton = editForm.querySelector('.popup__button');
+
+// Обработчики открытия и закрытия карточки edit
+editButton.addEventListener('click', () => {
+    editForm.elements['name'].value = profileName.textContent;
+    editForm.elements['description'].value = profileDescription.textContent;
+    openModal(editPopup);
+});
+
+closeEditButton.addEventListener('click', () => {
+    closeModal(editPopup);
+});
+
 // Пример использования в обработчиках submit
 editForm.addEventListener('submit', (event) => {
     event.preventDefault();
@@ -117,8 +118,23 @@ editForm.addEventListener('submit', (event) => {
     }
 });
 
-editForm.addEventListener('input', function () {
-  checkEditValidity();
+const toggleButtonState = (form, button) => {
+    if (form.checkValidity()) {
+        button.classList.remove('popup__button_disabled');
+        button.disabled = false;
+    } else {
+        button.classList.add('popup__button_disabled');
+        button.disabled = true;
+    }
+};
+
+// Для editForm
+editForm.addEventListener('input', () => {
+    toggleButtonState(editForm, editFormSubmitButton);
+});
+
+editButton.addEventListener('click', () => {
+    toggleButtonState(editForm, editFormSubmitButton);
 });
 
 // Локальная загрузка данных
@@ -163,6 +179,7 @@ const imagePopup = page.querySelector('.popup_type_image');
 const popupImage = imagePopup.querySelector('.popup__image');
 const popupCaption = imagePopup.querySelector('.popup__caption');
 const closeImageButton = imagePopup.querySelector('.popup__close');
+const newCardFormSubmitButton = newCardForm.querySelector('.popup__button');
 
 // Функция открытия попапа с изображением
 function openImagePopup(imageSrc, imageAlt) {
@@ -175,6 +192,12 @@ function openImagePopup(imageSrc, imageAlt) {
 
 // Закрытие попапа с изображением
 closeImageButton.addEventListener('click', () => closeModal(imagePopup));
+
+imagePopup.addEventListener('click', (event) => {
+    if (event.target === imagePopup) { // Если клик был вне содержимого попапа
+        closeModal(imagePopup);
+    }
+});
 
 // Шаблон карточки и список
 const placesList = page.querySelector('.places__list');
@@ -214,35 +237,26 @@ function addCard(name, link) {
 newCardForm.addEventListener('submit', (event) => {
     event.preventDefault();
 
-    const placeName = newCardForm.elements['place-name'].value;
-    const placeLink = newCardForm.elements['link'].value;
+    if (validateForm(newCardForm)) {
+        const placeName = newCardForm.elements['place-name'].value;
+        const placeLink = newCardForm.elements['link'].value;
 
-    addCard(placeName, placeLink);
-    closeModal(newCardPopup);
-    newCardForm.reset();
+        addCard(placeName, placeLink);
+        closeModal(newCardPopup);
+        newCardForm.reset();
+    }
 });
 
-newCardForm.addEventListener('input', function () {
-  checkEditValidity();
+// Для newCardForm
+newCardForm.addEventListener('input', () => {
+    toggleButtonState(newCardForm, newCardFormSubmitButton);
 });
 
-// Инициализация валидации для форм
-const enableValidationForm = () => {
-    const forms = Array.from(document.querySelectorAll('.popup__form'));
-    forms.forEach((form) => {
-        form.addEventListener('submit', (event) => {
-            event.preventDefault();
-            if (validateForm(form)) {
-                // Дополнительные действия, если форма валидна
-                console.log('Форма успешно отправлена');
-            }
-        });
-        setEventListeners(form);
-    });
-};
+newCardButton.addEventListener('click', () => {
+    newCardForm.reset(); // Очистите поля, если нужно
+    toggleButtonState(newCardForm, newCardFormSubmitButton);
+});
 
-// Запуск валидации
-enableValidationForm();
 
 // Функция для рендера начальных карточек
 function renderInitialCards(cards) {
@@ -253,6 +267,21 @@ function renderInitialCards(cards) {
 
 // Вызываем функцию при загрузке страницы
 renderInitialCards(initialCards);
+
+// Добавление слушателя на клавишу Esc
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') { // Проверка, что нажата клавиша Escape
+        if (editPopup) {
+            closeModal(editPopup);
+        }
+        if (newCardPopup) {
+            closeModal(newCardPopup);
+        }
+        if (imagePopup) {
+            closeModal(imagePopup);
+        }
+    }
+});
 
 
 
