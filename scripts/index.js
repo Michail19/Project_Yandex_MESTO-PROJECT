@@ -1,5 +1,6 @@
 import {
-    getInitialCards
+    getInitialCards,
+    postCard
 } from './api.js';
 
 getInitialCards()
@@ -250,6 +251,7 @@ function createCard(name, link) {
 function addCard(name, link) {
     const newCard = createCard(name, link);
     placesList.prepend(newCard);
+    postCard(newCard)
 }
 
 newCardForm.addEventListener('submit', (event) => {
@@ -284,7 +286,7 @@ function renderInitialCards(cards) {
 }
 
 // Вызываем функцию при загрузке страницы
-renderInitialCards(initialCards);
+//renderInitialCards(initialCards);
 
 // Добавление слушателя на клавишу Esc
 document.addEventListener('keydown', (event) => {
@@ -300,6 +302,18 @@ document.addEventListener('keydown', (event) => {
         }
     }
 });
+
+
+// Отправка карт на сервер при загрузке страницы
+/*document.addEventListener('DOMContentLoaded', () => {
+    initializeCards(initialCards)
+        .then((serverResponse) => {
+            console.log('Карты успешно инициализированы на сервере:', serverResponse);
+        })
+        .catch((err) => {
+            console.error('Ошибка при инициализации карт:', err);
+        });
+});*/
 
 
 
