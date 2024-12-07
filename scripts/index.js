@@ -1,3 +1,14 @@
+import { getInitialCards } from './api.js';
+
+getInitialCards()
+  .then((result) => {
+    // обрабатываем результат
+  })
+  .catch((err) => {
+    console.log(err); // выводим ошибку в консоль
+  });
+
+
 const page = document.querySelector('.page');
 
 
