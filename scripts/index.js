@@ -99,6 +99,14 @@ const enableValidation = () => {
 // Запуск валидации
 enableValidation();
 
+// Функция создания формы отправки на сервер
+function createPostPayload(name, link) {
+    return {
+        name: name,
+        link: link,
+    };
+}
+
 
 // Popap edit
 const editPopup = page.querySelector('.popup_type_edit');
@@ -251,7 +259,7 @@ function createCard(name, link) {
 function addCard(name, link) {
     const newCard = createCard(name, link);
     placesList.prepend(newCard);
-    postCard(newCard)
+    postCard(createPostPayload(name, link)); 
 }
 
 newCardForm.addEventListener('submit', (event) => {
@@ -302,23 +310,3 @@ document.addEventListener('keydown', (event) => {
         }
     }
 });
-
-
-// Отправка карт на сервер при загрузке страницы
-/*document.addEventListener('DOMContentLoaded', () => {
-    initializeCards(initialCards)
-        .then((serverResponse) => {
-            console.log('Карты успешно инициализированы на сервере:', serverResponse);
-        })
-        .catch((err) => {
-            console.error('Ошибка при инициализации карт:', err);
-        });
-});*/
-
-
-
-// @todo: Темплейт карточки
-// @todo: DOM узлы
-// @todo: Функция создания карточки
-// @todo: Функция удаления карточки
-// @todo: Вывести карточки на страницу
