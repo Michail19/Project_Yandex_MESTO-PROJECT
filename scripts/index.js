@@ -1,12 +1,19 @@
-import { getInitialCards } from './api.js';
+import {
+    getInitialCards
+} from './api.js';
 
 getInitialCards()
-  .then((result) => {
-    // обрабатываем результат
-  })
-  .catch((err) => {
-    console.log(err); // выводим ошибку в консоль
-  });
+    .then((cards) => {
+        // Проверяем, что данные корректны
+        if (Array.isArray(cards)) {
+            renderInitialCards(cards); // Передаем карточки для отображения
+        } else {
+            console.error('Полученные данные не являются массивом:', cards);
+        }
+    })
+    .catch((err) => {
+        console.log(err); // выводим ошибку в консоль
+    });
 
 
 const page = document.querySelector('.page');
