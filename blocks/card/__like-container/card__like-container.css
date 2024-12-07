@@ -1,0 +1,6 @@
+.card__actions {
+  display: grid;
+  grid-template-rows: auto auto; /* Две строки: одна для кнопки, другая для текста */
+  justify-items: center; /* Центрирование элементов по горизонтали */
+  gap: 4px; /* Расстояние между строками */
+}
