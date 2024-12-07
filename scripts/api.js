@@ -51,12 +51,35 @@ export const postCard = async (card) => {
     }
 };
 
+export const editCardPost = async (profile) => {
+    try {
+        const response = await fetch(`${config.baseUrl}/cards`, {
+            method: 'PATCH',
+            headers: {
+                authorization: '7fcf3de6-59c1-4ab7-906f-9dafefeb6e1a',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(profile)
+        });
+
+        if (!response.ok) {
+            throw new Error(`Ошибка: ${response.status}`);
+        }
+
+        const cards = await response.json();
+        return cards; // Вернуть данные карточек
+    } catch (err) {
+        console.error('Ошибка при запросе данных:', err);
+        throw err;
+    }
+};
+
 fetch('https://nomoreparties.co/v1/frontend-st-cohort-201/cards', {
-  headers: {
-    authorization: '7fcf3de6-59c1-4ab7-906f-9dafefeb6e1a'
-  }
-})
-  .then(res => res.json())
-  .then((result) => {
-    console.log(result);
-  }); 
+        headers: {
+            authorization: '7fcf3de6-59c1-4ab7-906f-9dafefeb6e1a'
+        }
+    })
+    .then(res => res.json())
+    .then((result) => {
+        console.log(result);
+    });

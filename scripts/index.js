@@ -1,6 +1,7 @@
 import {
     getInitialCards,
-    postCard
+    postCard,
+    editCardPost
 } from './api.js';
 
 getInitialCards()
@@ -107,6 +108,14 @@ function createPostPayload(name, link) {
     };
 }
 
+// Функция создания формы отправки на сервер
+function createPostProfile(name, about) {
+    return {
+        name: name,
+        about: about,
+    };
+}
+
 
 // Popap edit
 const editPopup = page.querySelector('.popup_type_edit');
@@ -172,6 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function saveProfileToLocalStorage(name, description) {
     localStorage.setItem('profileName', name);
     localStorage.setItem('profileDescription', description);
+    editCardPost(createPostProfile(name, description));
 }
 
 function loadProfileFromLocalStorage() {
@@ -259,7 +269,7 @@ function createCard(name, link) {
 function addCard(name, link) {
     const newCard = createCard(name, link);
     placesList.prepend(newCard);
-    postCard(createPostPayload(name, link)); 
+    postCard(createPostPayload(name, link));
 }
 
 newCardForm.addEventListener('submit', (event) => {
