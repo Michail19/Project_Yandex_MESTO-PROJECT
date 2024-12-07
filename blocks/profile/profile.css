@@ -4,6 +4,8 @@
 @import url('./__info/profile__info.css');
 @import url('./__title/profile__title.css');
 @import url('./__image/profile__image.css');
+@import url('./__overlay/profile__overlay.css');
+@import url('./__avatar-container/profile__avatar-container.css');
 
 .profile {
   font-family: 'Inter', Arial, sans-serif;

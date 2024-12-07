@@ -6,7 +6,14 @@
   border-radius: 50%;
   background-size: cover;
   background-position: center;
-  margin: 0 29px 0 0;
+  width: 100%; /* Аватар занимает всю ширину контейнера */
+  height: 100%; /* Аватар занимает всю высоту контейнера */
+  object-fit: cover; /* Обрезка по центру */
+  transition: opacity 0.3s ease; /* Плавное изменение прозрачности */
+}
+
+.profile__avatar-container:hover .profile__image {
+  opacity: 0.25; /* Затемняем аватар */
 }
 
 @media screen and (max-width: 740px) {

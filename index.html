@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
@@ -15,7 +16,14 @@
         </header>
         <main class="content">
             <section class="profile page__section">
-                <div class="profile__image" style="background-image: url('./images/avatar.jpg');"></div>
+                <div class="profile__avatar-container">
+                    <div class="profile__image" style="background-image: url('./images/avatar.jpg');"></div>
+                    <div class="profile__overlay">
+                        <svg width="24" height="24" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10 1.32827L2.60377 8.7666L1.28302 7.41936L8.66038 0L10 1.32827ZM0 10L1.96226 9.41177L0.584906 8.08349L0 10Z" fill="white" />
+                        </svg>
+                    </div>
+                </div>
                 <div class="profile__info">
                     <h1 class="profile__title">Жак-Ив Кусто</h1>
                     <button class="profile__edit-button" type="button"></button>
@@ -63,6 +71,19 @@
                 </form>
             </div>
         </div>
+        <div class="popup popup_type_edit-avatar">
+            <div class="popup__content">
+                <button type="button" class="popup__close"></button>
+                <h3 class="popup__title">Обновить аватар</h3>
+                <form class="popup__form" name="edit-avatar-form">
+                    <input type="url" name="avatar-link" class="popup__input popup__input_type_avatar-link" placeholder="Ссылка на картинку" id="avatar-link-input" required>
+                    <span class="popup__input-error" id="avatar-link-input-error"></span>
+
+                    <button type="submit" class="button popup__button">Сохранить</button>
+                </form>
+            </div>
+        </div>
+
         <div class="popup popup_type_image">
             <div class="popup__content popup__content_content_image">
                 <button type="button" class="popup__close"></button>
@@ -88,4 +109,6 @@
             </div>
         </li>
     </template>
-</body></html>
+</body>
+
+</html>

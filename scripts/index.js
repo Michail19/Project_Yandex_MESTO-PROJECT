@@ -4,7 +4,8 @@ import {
     editCardPost,
     deleteCardPost,
     likeCard,
-    unlikeCard
+    unlikeCard,
+    editPost
 } from './api.js';
 
 getInitialCards()
@@ -338,6 +339,54 @@ function renderInitialCards(cards) {
     });
 }
 
+
+// Элементы для изменения аватара
+const editAvatarPopup = page.querySelector('.popup_type_edit-avatar');
+const avatarForm = document.forms['edit-avatar-form'];
+const avatarInput = avatarForm.querySelector('#avatar-link-input');
+const avatarSubmitButton = avatarForm.querySelector('.popup__button');
+const closeAvatarButton = editAvatarPopup.querySelector('.popup__close');
+const avatarImage = page.querySelector('.profile__image');
+const avatarOverlay = page.querySelector('.profile__overlay');
+
+// Открытие и закрытие попапа для изменения аватара
+avatarOverlay.addEventListener('click', () => {
+    avatarInput.value = ''; // Очищаем поле ввода
+    openModal(editAvatarPopup);
+});
+
+closeAvatarButton.addEventListener('click', () => {
+    closeModal(editAvatarPopup);
+});
+
+// Обработчик отправки формы для изменения аватара
+avatarForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+
+    const newAvatarUrl = avatarInput.value;
+
+    if (validateForm(avatarForm)) {
+        avatarImage.style.backgroundImage = `url('${newAvatarUrl}')`; // Установка нового аватара
+        saveAvatarToLocalStorage(newAvatarUrl); // Сохранение в локальное хранилище или отправка на сервер
+        closeModal(editAvatarPopup);
+    }
+});
+
+// Сохранение аватара в локальное хранилище
+function saveAvatarToLocalStorage(url) {
+    localStorage.setItem('avatarUrl', url);
+    editPost({ avatar: url }); // Отправка нового URL на сервер
+}
+
+// Загрузка аватара из локального хранилища
+document.addEventListener('DOMContentLoaded', () => {
+    const savedAvatarUrl = localStorage.getItem('avatarUrl');
+    if (savedAvatarUrl) {
+        avatarImage.style.backgroundImage = `url('${savedAvatarUrl}')`;
+    }
+});
+
+
 // Вызываем функцию при загрузке страницы
 //renderInitialCards(initialCards);
 
@@ -352,6 +401,9 @@ document.addEventListener('keydown', (event) => {
         }
         if (imagePopup) {
             closeModal(imagePopup);
+        }
+        if (editAvatarPopup) {
+            closeModal(editAvatarPopup);
         }
     }
 });

@@ -1,0 +1,22 @@
+.profile__overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Полупрозрачный черный фон */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0; /* Скрыто по умолчанию */
+  transition: opacity 0.3s ease; /* Плавное появление */
+}
+
+.profile__overlay svg {
+  width: 30%; /* Размер иконки относительно контейнера */
+  height: auto;
+}
+
+.profile__avatar-container:hover .profile__overlay {
+  opacity: 1; /* Показываем оверлей */
+}

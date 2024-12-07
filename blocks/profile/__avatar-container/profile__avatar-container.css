@@ -1,0 +1,9 @@
+.profile__avatar-container {
+  position: relative;
+  width: 100px; /* Ширина контейнера */
+  height: 100px; /* Высота контейнера */
+  border-radius: 50%; /* Круглый контейнер */
+  overflow: hidden; /* Скрываем содержимое за границами */
+  cursor: pointer; /* Курсор указателя */
+  margin: 0 29px 0 0;
+}
