@@ -1,7 +1,10 @@
 import {
     getInitialCards,
     postCard,
-    editCardPost
+    editCardPost,
+    deleteCardPost,
+    likeCard,
+    unlikeCard
 } from './api.js';
 
 getInitialCards()
@@ -101,10 +104,11 @@ const enableValidation = () => {
 enableValidation();
 
 // Функция создания формы отправки на сервер
-function createPostPayload(name, link) {
+function createPostPayload(name, link, likes) {
     return {
         name: name,
         link: link,
+        likes: likes,
     };
 }
 
@@ -241,23 +245,47 @@ const placesList = page.querySelector('.places__list');
 const cardTemplate = page.querySelector('#card-template').content;
 
 // Функция для создания новой карточки
-function createCard(name, link) {
+function createCard(name, link, likes = [], isRemovable = true) {
     const cardElement = cardTemplate.querySelector('.card').cloneNode(true);
 
     // Заполняем данные карточки
     const cardImage = cardElement.querySelector('.card__image');
     const cardTitle = cardElement.querySelector('.card__title');
+    const likeCount = cardElement.querySelector('.card__likes');
+    const deleteButton = cardElement.querySelector('.card__delete-button');
     cardImage.src = link;
     cardImage.alt = name;
     cardTitle.textContent = name;
+    likeCount.textContent = likes.length; // Устанавливаем количество лайков
+
+    // Если карточка не должна быть удаляемой
+    if (!isRemovable) {
+        deleteButton.remove(); // Удаляем кнопку удаления
+    } else {
+        deleteButton.addEventListener('click', () => {
+            deleteCardPost(cardElement);
+            cardElement.remove(); // Удаление карточки
+        });
+    }
 
     // Обработчики на элементы карточки
-    cardElement.querySelector('.card__delete-button').addEventListener('click', () => {
+    /*cardElement.querySelector('.card__delete-button').addEventListener('click', () => {
         cardElement.remove(); // Удаление карточки
-    });
+    });*/
 
     cardElement.querySelector('.card__like-button').addEventListener('click', (event) => {
         event.target.classList.toggle('card__like-button_is-active'); // Лайк
+        console.log(cardElement.getAttribute('data-id'));
+
+        // Обновляем количество лайков
+        if (event.target.classList.contains('card__like-button_is-active')) {
+            likes.push(cardElement.getAttribute('data-id')); // Имитируем добавление лайка
+            likeCard(cardElement.getAttribute('data-id'));
+        } else {
+            likes.pop(); // Имитируем удаление лайка
+            unlikeCard(cardElement.getAttribute('data-id'));
+        }
+        likeCount.textContent = likes.length;
     });
 
     cardImage.addEventListener('click', () => openImagePopup(link, name)); // Открытие попапа с изображением
@@ -266,10 +294,17 @@ function createCard(name, link) {
 }
 
 // Функция добавления карточки в список
-function addCard(name, link) {
-    const newCard = createCard(name, link);
-    placesList.prepend(newCard);
-    postCard(createPostPayload(name, link));
+function addCard(name, link, likes = [], isRemovable = true) {
+    postCard(createPostPayload(name, link, likes))
+        .then((newCard) => {
+            const newCardElement = createCard(name, link, likes, isRemovable);
+            newCardElement.setAttribute('data-id', newCard._id); // Set the ID from the response
+            console.log(newCard._id, newCard.name);
+            placesList.prepend(newCardElement); // Add the card to the list
+        })
+        .catch((err) => {
+            console.error('Не удалось добавить карточку:', err);
+        });
 }
 
 newCardForm.addEventListener('submit', (event) => {
@@ -299,7 +334,7 @@ newCardButton.addEventListener('click', () => {
 // Функция для рендера начальных карточек
 function renderInitialCards(cards) {
     cards.forEach((card) => {
-        addCard(card.name, card.link);
+        addCard(card.name, card.link, card.likes, false);
     });
 }
 
