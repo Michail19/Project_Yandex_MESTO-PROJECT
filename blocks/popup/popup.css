@@ -10,6 +10,8 @@
 @import url('./__button/_disabled/popup__button_disabled.css');
 @import url('./__caption/popup__caption.css');
 @import url('./__image/popup__image.css');
+@import url('./__button-loader/popup__button-loader.css');
+@import url('./__button-text/popup__button-text.css');
 
 .popup {
   font-family: 'Inter', Arial, sans-serif;

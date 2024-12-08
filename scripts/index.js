@@ -151,11 +151,28 @@ editForm.addEventListener('submit', (event) => {
         const nameInput = editForm.elements['name'].value;
         const descriptionInput = editForm.elements['description'].value;
 
-        profileName.textContent = nameInput;
-        profileDescription.textContent = descriptionInput;
+        // Сохраняем оригинальный текст кнопки
+        const originalButtonText = editFormSubmitButton.textContent;
 
-        closeModal(editPopup);
-        saveProfileToLocalStorage(nameInput, descriptionInput);
+        // Меняем текст кнопки на "Сохранение..."
+        editFormSubmitButton.textContent = 'Сохранение...';
+        editFormSubmitButton.disabled = true;
+
+        try {
+            // Обновляем профиль после успешного запроса
+            profileName.textContent = nameInput;
+            profileDescription.textContent = descriptionInput;
+
+            closeModal(editPopup);
+            saveProfileToLocalStorage(nameInput, descriptionInput);
+        } catch (error) {
+            console.error('Ошибка при сохранении данных:', error);
+            alert('Не удалось сохранить изменения. Попробуйте снова.');
+        } finally {
+            // Возвращаем текст кнопки обратно
+            editFormSubmitButton.textContent = originalButtonText;
+            editFormSubmitButton.disabled = false;
+        }
     }
 });
 
@@ -245,6 +262,12 @@ imagePopup.addEventListener('click', (event) => {
 const placesList = page.querySelector('.places__list');
 const cardTemplate = page.querySelector('#card-template').content;
 
+// Попап подтверждения удаления
+const popupDelete = page.querySelector('.popup_type_delete');
+const closeButton = popupDelete.querySelector('.popup__close');
+const confirmButton = popupDelete.querySelector('.popup__button');
+let cardToDelete = null; // Глобальная переменная для хранения текущей карточки
+
 // Функция для создания новой карточки
 function createCard(name, link, likes = [], isRemovable = true) {
     const cardElement = cardTemplate.querySelector('.card').cloneNode(true);
@@ -264,15 +287,10 @@ function createCard(name, link, likes = [], isRemovable = true) {
         deleteButton.remove(); // Удаляем кнопку удаления
     } else {
         deleteButton.addEventListener('click', () => {
-            deleteCardPost(cardElement);
-            cardElement.remove(); // Удаление карточки
+            cardToDelete = cardElement; // Сохраняем карточку, которую нужно удалить
+            openModal(popupDelete); // Открываем окно подтверждения
         });
     }
-
-    // Обработчики на элементы карточки
-    /*cardElement.querySelector('.card__delete-button').addEventListener('click', () => {
-        cardElement.remove(); // Удаление карточки
-    });*/
 
     cardElement.querySelector('.card__like-button').addEventListener('click', (event) => {
         event.target.classList.toggle('card__like-button_is-active'); // Лайк
@@ -294,6 +312,38 @@ function createCard(name, link, likes = [], isRemovable = true) {
     return cardElement;
 }
 
+
+// Обработчик подтверждения удаления
+confirmButton.addEventListener('click', (e) => {
+    e.preventDefault(); // Предотвратить стандартное поведение формы
+
+    if (cardToDelete) {
+        // Сохраняем оригинальный текст кнопки
+        const originalButtonText = popupDelete.textContent;
+
+        // Меняем текст кнопки на "Сохранение..."
+        popupDelete.textContent = 'Да...';
+        popupDelete.disabled = true;
+
+        try {
+            deleteCardPost(cardToDelete); // Удалить карточку на сервере (опционально)
+            cardToDelete.remove(); // Удалить карточку из DOM
+            cardToDelete = null; // Очистить переменную
+            closeModal(popupDelete); // Закрыть окно подтверждения
+        } catch (error) {
+            console.error('Ошибка при сохранении данных:', error);
+            alert('Не удалось сохранить изменения. Попробуйте снова.');
+        } finally {
+            // Возвращаем текст кнопки обратно
+            popupDelete.textContent = originalButtonText;
+            popupDelete.disabled = false;
+        }
+    }
+});
+
+// Обработчик кнопки закрытия
+closeButton.addEventListener('click', () => closeModal(popupDelete));
+
 // Функция добавления карточки в список
 function addCard(name, link, likes = [], isRemovable = true) {
     postCard(createPostPayload(name, link, likes))
@@ -312,12 +362,49 @@ newCardForm.addEventListener('submit', (event) => {
     event.preventDefault();
 
     if (validateForm(newCardForm)) {
+        //        const placeName = newCardForm.elements['place-name'].value;
+        //        const placeLink = newCardForm.elements['link'].value;
+        //
+        //        // Сохраняем оригинальный текст кнопки
+        //        const originalButtonText = newCardFormSubmitButton.textContent;
+        //
+        //        // Меняем текст кнопки на "Сохранение..."
+        //        newCardFormSubmitButton.textContent = 'Создание...';
+        //        newCardFormSubmitButton.disabled = true;
+        //
+        //        // Эмулируем процесс сохранения (замените setTimeout на реальный запрос)
+        //        setTimeout(() => {
+        //            addCard(placeName, placeLink);
+        //            closeModal(newCardPopup);
+        //            newCardForm.reset();
+        //
+        //            // Возвращаем текст кнопки обратно
+        //            newCardFormSubmitButton.textContent = originalButtonText;
+        //            newCardFormSubmitButton.disabled = false;
+        //        }, 2000); // Задержка 2 секунды для примера
+
         const placeName = newCardForm.elements['place-name'].value;
         const placeLink = newCardForm.elements['link'].value;
 
-        addCard(placeName, placeLink);
-        closeModal(newCardPopup);
-        newCardForm.reset();
+        // Сохраняем оригинальный текст кнопки
+        const originalButtonText = newCardFormSubmitButton.textContent;
+
+        // Меняем текст кнопки на "Сохранение..."
+        newCardFormSubmitButton.textContent = 'Сохранение...';
+        newCardFormSubmitButton.disabled = true;
+
+        try {
+            addCard(placeName, placeLink);
+            closeModal(newCardPopup);
+            newCardForm.reset();
+        } catch (error) {
+            console.error('Ошибка при сохранении данных:', error);
+            alert('Не удалось сохранить изменения. Попробуйте снова.');
+        } finally {
+            // Возвращаем текст кнопки обратно
+            newCardFormSubmitButton.textContent = originalButtonText;
+            newCardFormSubmitButton.disabled = false;
+        }
     }
 });
 
@@ -366,16 +453,34 @@ avatarForm.addEventListener('submit', (event) => {
     const newAvatarUrl = avatarInput.value;
 
     if (validateForm(avatarForm)) {
-        avatarImage.style.backgroundImage = `url('${newAvatarUrl}')`; // Установка нового аватара
-        saveAvatarToLocalStorage(newAvatarUrl); // Сохранение в локальное хранилище или отправка на сервер
-        closeModal(editAvatarPopup);
+        // Сохраняем оригинальный текст кнопки
+        const originalButtonText = avatarSubmitButton.textContent;
+
+        // Меняем текст кнопки на "Сохранение..."
+        avatarSubmitButton.textContent = 'Сохранение...';
+        avatarSubmitButton.disabled = true;
+
+        try {
+            avatarImage.style.backgroundImage = `url('${newAvatarUrl}')`; // Установка нового аватара
+            saveAvatarToLocalStorage(newAvatarUrl); // Сохранение в локальное хранилище или отправка на сервер
+            closeModal(editAvatarPopup);
+        } catch (error) {
+            console.error('Ошибка при сохранении данных:', error);
+            alert('Не удалось сохранить изменения. Попробуйте снова.');
+        } finally {
+            // Возвращаем текст кнопки обратно
+            avatarSubmitButton.textContent = originalButtonText;
+            avatarSubmitButton.disabled = false;
+        }
     }
 });
 
 // Сохранение аватара в локальное хранилище
 function saveAvatarToLocalStorage(url) {
     localStorage.setItem('avatarUrl', url);
-    editPost({ avatar: url }); // Отправка нового URL на сервер
+    editPost({
+        avatar: url
+    }); // Отправка нового URL на сервер
 }
 
 // Загрузка аватара из локального хранилища
@@ -384,6 +489,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (savedAvatarUrl) {
         avatarImage.style.backgroundImage = `url('${savedAvatarUrl}')`;
     }
+});
+
+avatarForm.addEventListener('input', () => {
+    toggleButtonState(avatarForm, avatarSubmitButton);
+});
+
+avatarOverlay.addEventListener('click', () => {
+    toggleButtonState(avatarForm, avatarSubmitButton);
 });
 
 
@@ -404,6 +517,9 @@ document.addEventListener('keydown', (event) => {
         }
         if (editAvatarPopup) {
             closeModal(editAvatarPopup);
+        }
+        if (popupDelete) {
+            closeModal(popupDelete);
         }
     }
 });
