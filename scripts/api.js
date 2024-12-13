@@ -77,29 +77,28 @@ export const editCardPost = async (profile) => {
 
 export const deleteCardPost = async (cardElement) => {
     try {
-        const cardId = cardElement.getAttribute('data-id'); // Получаем cardId  
-        console.log(cardId);
+        const cardId = cardElement.getAttribute('data-id'); // Получаем cardId
+        if (!cardId) throw new Error('ID карточки не найден');
 
-        // Если нужно, можно отправить запрос на сервер для удаления
         const response = await fetch(`${config.baseUrl}/cards/${cardId}`, {
             method: 'DELETE',
             headers: {
                 authorization: '7fcf3de6-59c1-4ab7-906f-9dafefeb6e1a',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
         });
 
         if (!response.ok) {
-            throw new Error(`Ошибка: ${response.status}`);
+            throw new Error(`Ошибка удаления: ${response.status}`);
         }
 
-        const cards = await response.json();
-        return cards; // Вернуть данные карточек
+        return await response.json(); // Возвращаем данные ответа, если нужно
     } catch (err) {
-        console.error('Ошибка при запросе данных:', err);
+        console.error('Ошибка при удалении карточки:', err);
         throw err;
     }
-}
+};
+
 
 // Функция для добавления лайка (PUT-запрос)
 export function likeCard(cardId) {

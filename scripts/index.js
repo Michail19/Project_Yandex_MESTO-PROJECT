@@ -143,7 +143,7 @@ closeEditButton.addEventListener('click', () => {
     closeModal(editPopup);
 });
 
-// Пример использования в обработчиках submit
+// Использование обработчика submit
 editForm.addEventListener('submit', async (event) => {
     event.preventDefault();
 
@@ -315,31 +315,30 @@ function createCard(name, link, likes = [], isRemovable = true) {
 
 // Обработчик подтверждения удаления
 confirmButton.addEventListener('click', async (event) => {
-    e.preventDefault(); // Предотвратить стандартное поведение формы
+    event.preventDefault(); // Предотвратить стандартное поведение формы
 
     if (cardToDelete) {
-        // Сохраняем оригинальный текст кнопки
-        const originalButtonText = popupDelete.textContent;
+        const originalButtonText = confirmButton.textContent;
 
-        // Меняем текст кнопки на "Сохранение..."
-        popupDelete.textContent = 'Да...';
-        popupDelete.disabled = true;
+        confirmButton.textContent = 'Да...';
+        confirmButton.disabled = true;
 
         try {
-            await deleteCardPost(cardToDelete); // Удалить карточку на сервере (опционально)
+            await deleteCardPost(cardToDelete); // Удалить карточку на сервере
             cardToDelete.remove(); // Удалить карточку из DOM
             cardToDelete = null; // Очистить переменную
             closeModal(popupDelete); // Закрыть окно подтверждения
         } catch (error) {
-            console.error('Ошибка при сохранении данных:', error);
-            alert('Не удалось сохранить изменения. Попробуйте снова.');
+            console.error('Ошибка при удалении карточки:', error);
+            alert('Не удалось удалить карточку. Попробуйте снова.');
         } finally {
-            // Возвращаем текст кнопки обратно
-            popupDelete.textContent = originalButtonText;
-            popupDelete.disabled = false;
+            // Восстановить текст кнопки
+            confirmButton.textContent = originalButtonText;
+            confirmButton.disabled = false;
         }
     }
 });
+
 
 // Обработчик кнопки закрытия
 closeButton.addEventListener('click', () => closeModal(popupDelete));
@@ -480,11 +479,9 @@ avatarForm.addEventListener('submit', async (event) => {
 });
 
 // Сохранение аватара в локальное хранилище
-function saveAvatarToLocalStorage(url) {
+async function saveAvatarToLocalStorage(url) {
+    await editPost(url);
     localStorage.setItem('avatarUrl', url);
-    editPost({
-        avatar: url
-    }); // Отправка нового URL на сервер
 }
 
 // Загрузка аватара из локального хранилища
