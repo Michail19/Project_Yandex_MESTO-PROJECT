@@ -144,7 +144,7 @@ closeEditButton.addEventListener('click', () => {
 });
 
 // Пример использования в обработчиках submit
-editForm.addEventListener('submit', (event) => {
+editForm.addEventListener('submit', async (event) => {
     event.preventDefault();
 
     if (validateForm(editForm)) {
@@ -164,7 +164,7 @@ editForm.addEventListener('submit', (event) => {
             profileDescription.textContent = descriptionInput;
 
             closeModal(editPopup);
-            saveProfileToLocalStorage(nameInput, descriptionInput);
+            await saveProfileToLocalStorage(nameInput, descriptionInput);
         } catch (error) {
             console.error('Ошибка при сохранении данных:', error);
             alert('Не удалось сохранить изменения. Попробуйте снова.');
@@ -314,7 +314,7 @@ function createCard(name, link, likes = [], isRemovable = true) {
 
 
 // Обработчик подтверждения удаления
-confirmButton.addEventListener('click', (e) => {
+confirmButton.addEventListener('click', async (event) => {
     e.preventDefault(); // Предотвратить стандартное поведение формы
 
     if (cardToDelete) {
@@ -326,7 +326,7 @@ confirmButton.addEventListener('click', (e) => {
         popupDelete.disabled = true;
 
         try {
-            deleteCardPost(cardToDelete); // Удалить карточку на сервере (опционально)
+            await deleteCardPost(cardToDelete); // Удалить карточку на сервере (опционально)
             cardToDelete.remove(); // Удалить карточку из DOM
             cardToDelete = null; // Очистить переменную
             closeModal(popupDelete); // Закрыть окно подтверждения
@@ -346,19 +346,20 @@ closeButton.addEventListener('click', () => closeModal(popupDelete));
 
 // Функция добавления карточки в список
 function addCard(name, link, likes = [], isRemovable = true) {
-    postCard(createPostPayload(name, link, likes))
+    return postCard(createPostPayload(name, link, likes))
         .then((newCard) => {
             const newCardElement = createCard(name, link, likes, isRemovable);
             newCardElement.setAttribute('data-id', newCard._id); // Set the ID from the response
             console.log(newCard._id, newCard.name);
             placesList.prepend(newCardElement); // Add the card to the list
+            return newCard; // Возвращаем данные карточки
         })
         .catch((err) => {
             console.error('Не удалось добавить карточку:', err);
         });
 }
 
-newCardForm.addEventListener('submit', (event) => {
+newCardForm.addEventListener('submit', async (event) => {
     event.preventDefault();
 
     if (validateForm(newCardForm)) {
@@ -368,7 +369,7 @@ newCardForm.addEventListener('submit', (event) => {
         //        // Сохраняем оригинальный текст кнопки
         //        const originalButtonText = newCardFormSubmitButton.textContent;
         //
-        //        // Меняем текст кнопки на "Сохранение..."
+        //        // Меняем текст кнопки на "Создание..."
         //        newCardFormSubmitButton.textContent = 'Создание...';
         //        newCardFormSubmitButton.disabled = true;
         //
@@ -389,12 +390,15 @@ newCardForm.addEventListener('submit', (event) => {
         // Сохраняем оригинальный текст кнопки
         const originalButtonText = newCardFormSubmitButton.textContent;
 
-        // Меняем текст кнопки на "Сохранение..."
-        newCardFormSubmitButton.textContent = 'Сохранение...';
+        // Меняем текст кнопки на "Создание..."
+        newCardFormSubmitButton.textContent = 'Создание...';
         newCardFormSubmitButton.disabled = true;
 
         try {
-            addCard(placeName, placeLink);
+            // Дожидаемся успешного добавления карточки
+            const newCard = await addCard(placeName, placeLink);
+
+            // Закрываем попап и сбрасываем форму только после успешного добавления
             closeModal(newCardPopup);
             newCardForm.reset();
         } catch (error) {
@@ -447,7 +451,7 @@ closeAvatarButton.addEventListener('click', () => {
 });
 
 // Обработчик отправки формы для изменения аватара
-avatarForm.addEventListener('submit', (event) => {
+avatarForm.addEventListener('submit', async (event) => {
     event.preventDefault();
 
     const newAvatarUrl = avatarInput.value;
@@ -462,7 +466,7 @@ avatarForm.addEventListener('submit', (event) => {
 
         try {
             avatarImage.style.backgroundImage = `url('${newAvatarUrl}')`; // Установка нового аватара
-            saveAvatarToLocalStorage(newAvatarUrl); // Сохранение в локальное хранилище или отправка на сервер
+            await saveAvatarToLocalStorage(newAvatarUrl); // Сохранение в локальное хранилище или отправка на сервер
             closeModal(editAvatarPopup);
         } catch (error) {
             console.error('Ошибка при сохранении данных:', error);
